@@ -23,4 +23,14 @@ class UserLoginForm(AuthenticationForm):
     )
     
     def clean_username(self):
-        return self.cleaned_data.get('username') 
+        username_or_email = self.cleaned_data.get('username')
+        if '@' in username_or_email:  # Check if input looks like an email address
+            try:
+                user = User.objects.get(email=username_or_email)
+                return user.username
+            except User.DoesNotExist:
+                raise forms.ValidationError(
+                    _('No user is associated with this email address.'),
+                    code='invalid_login',
+                )
+        return username_or_email  # Return as is if not an email
