@@ -23,11 +23,4 @@ class UserLoginForm(AuthenticationForm):
     )
     
     def clean_username(self):
-        username = self.cleaned_data.get('username')
-        if '@' in username:
-            try:
-                user = User.objects.get(email=username)
-                return user.username
-            except User.DoesNotExist:
-                pass
-        return username 
+        return self.cleaned_data.get('username') 

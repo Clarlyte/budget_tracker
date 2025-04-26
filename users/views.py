@@ -9,14 +9,21 @@ from .forms import UserRegistrationForm, UserLoginForm
 def login_view(request):
     if request.method == 'POST':
         form = UserLoginForm(request, data=request.POST)
+        print('POST data:', request.POST)  # Debug POST data
+        print('Form valid:', form.is_valid())  # Debug form validity
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
+            print('Cleaned username:', username)
+            print('Cleaned password:', password)
             user = authenticate(username=username, password=password)
+            print('Authenticated user:', user)
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Welcome back, {username}!')
                 return redirect('dashboard')
+        else:
+            print('Form errors:', form.errors)
         messages.error(request, 'Invalid username or password.')
     else:
         form = UserLoginForm()
@@ -55,7 +62,7 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     messages.success(request, 'You have been logged out successfully.')
-    return redirect('login')
+    return redirect('users:login')
 
 @login_required
 def profile_view(request):
