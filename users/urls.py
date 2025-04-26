@@ -1,7 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from .utils.email_verification import verify_email
 
 app_name = 'users'
 
@@ -34,7 +33,4 @@ urlpatterns = [
              template_name='users/password_reset/password_reset_complete.html'
          ),
          name='password_reset_complete'),
-    
-    # Email Verification URL
-    path('verify-email/<uuid:token>/', verify_email, name='verify_email'),
 ]

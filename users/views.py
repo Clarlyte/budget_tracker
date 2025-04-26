@@ -4,7 +4,6 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import UserRegistrationForm, UserLoginForm
-from .utils.email_verification import send_verification_email
 
 # Create your views here.
 
@@ -16,9 +15,6 @@ def login_view(request):
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
             if user is not None:
-                if not user.is_email_verified:
-                    messages.warning(request, 'Please verify your email address before logging in.')
-                    return redirect('login')
                 login(request, user)
                 messages.success(request, f'Welcome back, {username}!')
                 return redirect('dashboard')
@@ -32,8 +28,7 @@ def register(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            send_verification_email(user)
-            messages.success(request, 'Registration successful! Please check your email to verify your account.')
+            messages.success(request, 'Registration successful! You can now log in.')
             return redirect('login')
         else:
             messages.error(request, 'Please correct the errors below.')
