@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 
 class Entry(models.Model):
     INCOME = 'IN'
@@ -9,7 +9,7 @@ class Entry(models.Model):
         (EXPENSE, 'Expense'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     type = models.CharField(max_length=2, choices=TYPE_CHOICES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.CharField(max_length=200)
