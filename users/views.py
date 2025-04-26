@@ -6,7 +6,6 @@ from django.contrib import messages
 from .forms import UserRegistrationForm, UserLoginForm
 
 # Create your views here.
-
 def login_view(request):
     if request.method == 'POST':
         form = UserLoginForm(request, data=request.POST)
