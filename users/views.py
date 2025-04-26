@@ -28,7 +28,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             messages.success(request, 'Registration successful! You can now log in.')
-            return redirect('login')
+            return redirect('users:login')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
