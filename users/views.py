@@ -4,25 +4,27 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import UserRegistrationForm, UserLoginForm
+from .utils.email_verification import send_verification_email
 
 # Create your views here.
 
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = UserLoginForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
             if user is not None:
+                if not user.is_email_verified:
+                    messages.warning(request, 'Please verify your email address before logging in.')
+                    return redirect('login')
                 login(request, user)
-                return redirect('profile')
-            else:
-                messages.error(request, "Invalid username or password.")
-        else:
-            messages.error(request, "Invalid username or password.")
+                messages.success(request, f'Welcome back, {username}!')
+                return redirect('dashboard')
+        messages.error(request, 'Invalid username or password.')
     else:
-        form = AuthenticationForm()
+        form = UserLoginForm()
     return render(request, 'users/login.html', {'form': form})
 
 def register(request):
@@ -30,9 +32,9 @@ def register(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
-            messages.success(request, 'Registration successful!')
-            return redirect('dashboard')
+            send_verification_email(user)
+            messages.success(request, 'Registration successful! Please check your email to verify your account.')
+            return redirect('login')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
