@@ -139,3 +139,6 @@ CSRF_COOKIE_SECURE = not DEBUG  # Only send CSRF cookie over HTTPS in production
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/users/login/'
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

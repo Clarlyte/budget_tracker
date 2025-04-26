@@ -6,23 +6,27 @@ from django.contrib import messages
 from .forms import UserRegistrationForm, UserLoginForm
 
 # Create your views here.
-
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = UserLoginForm(request, data=request.POST)
+        print('POST data:', request.POST)  # Debug POST data
+        print('Form valid:', form.is_valid())  # Debug form validity
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
+            print('Cleaned username:', username)
+            print('Cleaned password:', password)
             user = authenticate(username=username, password=password)
+            print('Authenticated user:', user)
             if user is not None:
                 login(request, user)
-                return redirect('profile')
-            else:
-                messages.error(request, "Invalid username or password.")
+                messages.success(request, f'Welcome back, {username}!')
+                return redirect('dashboard')
         else:
-            messages.error(request, "Invalid username or password.")
+            print('Form errors:', form.errors)
+        messages.error(request, 'Invalid username or password.')
     else:
-        form = AuthenticationForm()
+        form = UserLoginForm()
     return render(request, 'users/login.html', {'form': form})
 
 def register(request):
@@ -30,9 +34,8 @@ def register(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
-            messages.success(request, 'Registration successful!')
-            return redirect('dashboard')
+            messages.success(request, 'Registration successful! You can now log in.')
+            return redirect('users:login')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -59,7 +62,7 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     messages.success(request, 'You have been logged out successfully.')
-    return redirect('login')
+    return redirect('users:login')
 
 @login_required
 def profile_view(request):
